@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Journey - Daily Syllabus Tracker & Study Timer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0f172a',
+                            900: '#0b1329',
+                            950: '#050a18',
+                        },
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050a18; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .gold-glow { box-shadow: 0 0 15px -3px rgba(245, 158, 11, 0.3); }
+        .blue-glow { box-shadow: 0 0 20px -5px rgba(37, 99, 235, 0.35); }
+    </style>
+</head>
+<body class="bg-navy-950 text-slate-100 font-sans min-h-full flex flex-col antialiased selection:bg-brand-600 selection:text-white">
+
+    <header class="border-b border-slate-800/80 bg-navy-900/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-gold-500 p-0.5 shadow-lg flex items-center justify-center">
+                    <div class="w-full h-full bg-navy-950 rounded-[10px] flex items-center justify-center">
+                        <i data-lucide="award" class="w-5 h-5 text-gold-400"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-heading font-bold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2">
+                        CA Journey <span class="text-xs px-2 py-0.5 bg-brand-500/20 text-brand-400 border border-brand-500/30 rounded-md font-semibold">ICAI Scheme</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 -mt-0.5 hidden sm:block">Sign of Excellence & Discipline</p>
+                </div>
+            </div>
+
+            <!-- View Tabs Navigation -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div class="bg-navy-950/80 p-1 rounded-xl border border-slate-800 flex text-xs font-medium">
+                    <button id="nav-tracker" onclick="switchMainTab('tracker')" class="px-3 py-1.5 rounded-lg transition bg-brand-600 text-white font-semibold flex items-center gap-1.5">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Syllabus</span>
+                    </button>
+                    <button id="nav-timer" onclick="switchMainTab('timer')" class="px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="timer" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Timer</span>
+                    </button>
+                    <button id="nav-calendar" onclick="switchMainTab('calendar')" class="px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Logs</span>
+                    </button>
+                    <button id="nav-analytics" onclick="switchMainTab('analytics')" class="px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Analytics</span>
+                    </button>
+                </div>
+
+                <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition" title="Data Backup / Import">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 bg-gradient-to-br from-navy-900 to-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/10 border border-gold-500/20 px-2.5 py-1 rounded-full">
+                            Active Level: <span id="current-level-badge">CA Intermediate</span>
+                        </span>
+                        <h2 class="text-xl font-heading font-bold text-white mt-2" id="quote-display">Keep pushing — Every revision counts towards AIR!</h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold font-heading text-brand-400" id="stat-overall-percent">0%</div>
+                        <div class="text-xs text-slate-400">Total Completion</div>
+                    </div>
+                </div>
+
+                <!-- Level Progress Indicator Bar -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-medium text-slate-400">
+                        <span id="level-progress-label">Level Syllabus Coverage</span>
+                        <span id="stat-completed-count">0 / 0 Stage Clearances</span>
+                    </div>
+                    <div class="w-full bg-navy-950 rounded-full h-3 overflow-hidden p-0.5 border border-slate-800">
+                        <div id="overall-progress-bar" class="bg-gradient-to-r from-brand-600 via-indigo-500 to-gold-500 h-full rounded-full transition-all duration-500 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Grid -->
+                <div class="grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-800/80 text-center">
+                    <div class="bg-navy-950/60 rounded-xl p-2 border border-slate-800/60">
+                        <div class="text-[10px] text-slate-400">Today's Study</div>
+                        <div id="stat-today-time" class="text-sm sm:text-base font-bold text-white mt-0.5">0h 0m</div>
+                    </div>
+                    <div class="bg-navy-950/60 rounded-xl p-2 border border-slate-800/60">
+                        <div class="text-[10px] text-slate-400">Target / Day</div>
+                        <div class="text-sm sm:text-base font-bold text-amber-400 mt-0.5 flex items-center justify-center gap-1 cursor-pointer" onclick="setDailyGoal()">
+                            <span id="stat-daily-goal">8h</span>
+                            <i data-lucide="edit-2" class="w-3 h-3 text-slate-400"></i>
+                        </div>
+                    </div>
+                    <div class="bg-navy-950/60 rounded-xl p-2 border border-slate-800/60">
+                        <div class="text-[10px] text-slate-400">7-Day Study</div>
+                        <div id="stat-week-time" class="text-sm sm:text-base font-bold text-emerald-400 mt-0.5">0h 0m</div>
+                    </div>
+                    <div class="bg-navy-950/60 rounded-xl p-2 border border-slate-800/60">
+                        <div class="text-[10px] text-slate-400">Streak</div>
+                        <div id="stat-streak" class="text-sm sm:text-base font-bold text-gold-400 mt-0.5">🔥 0 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between blue-glow">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 rounded-lg bg-brand-500/10 text-brand-400">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-white">Focus Timer</h3>
+                    </div>
+                    <span id="timer-status-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                        IDLE
+                    </span>
+                </div>
+
+                <div class="text-center my-2">
+                    <div id="timer-display-mini" class="font-mono text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                        00:00:00
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1" id="timer-subject-hint">Stopwatch Mode</p>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex gap-2">
+                        <button id="mini-start-btn" onclick="toggleTimer()" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-medium py-2 px-3 rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 text-xs sm:text-sm">
+                            <i data-lucide="play" class="w-4 h-4" id="mini-btn-icon"></i>
+                            <span id="mini-btn-text">Start Session</span>
+                        </button>
+                        <button onclick="resetTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl border border-slate-700 transition" title="Reset">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <button id="mini-save-btn" onclick="openSaveSessionModal()" disabled class="w-full bg-slate-800 text-slate-500 text-xs font-medium py-2 px-3 rounded-xl border border-slate-700/50 transition flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                        <span>Log Recorded Time</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section id="tab-tracker" class="space-y-6">
+            
+            <!-- CA Level Selection Tabs -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+                <div class="flex bg-navy-900 p-1.5 rounded-2xl border border-slate-800 w-full sm:w-auto">
+                    <button onclick="setLevel('foundation')" id="level-tab-foundation" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white">
+                        CA Foundation
+                    </button>
+                    <button onclick="setLevel('intermediate')" id="level-tab-intermediate" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white">
+                        CA Intermediate
+                    </button>
+                    <button onclick="setLevel('final')" id="level-tab-final" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white">
+                        CA Final
+                    </button>
+                </div>
+
+                <!-- Filters & Controls -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-64">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="topic-search" oninput="renderSyllabus()" placeholder="Search subjects or chapters..." class="w-full pl-9 pr-3 py-2 bg-navy-900 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+                    </div>
+                    <button onclick="expandAllAccordions()" class="p-2 bg-navy-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition text-xs flex items-center gap-1" title="Expand All">
+                        <i data-lucide="chevrons-down" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="collapseAllAccordions()" class="p-2 bg-navy-900 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition text-xs flex items-center gap-1" title="Collapse All">
+                        <i data-lucide="chevrons-up" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Legend for Multi-stage Progress -->
+            <div class="bg-navy-900/60 p-3 rounded-xl border border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+                <span class="font-semibold text-slate-300">Multi-Stage Revision Tracking:</span>
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span> Unchecked</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Concept Done</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Questions Practiced</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Revision 1</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Revision 2 (Mastered)</span>
+                </div>
+            </div>
+
+            <!-- Syllabus Container -->
+            <div id="syllabus-container" class="space-y-4">
+                <!-- Dynamic Content -->
+            </div>
+        </section>
+
+        <section id="tab-timer" class="hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
+                
+                <!-- Timer Mode Toggle -->
+                <div class="inline-flex bg-navy-950 p-1.5 rounded-2xl border border-slate-800">
+                    <button id="mode-stopwatch-btn" onclick="setTimerMode('stopwatch')" class="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white transition">
+                        Stopwatch
+                    </button>
+                    <button id="mode-pomodoro-btn" onclick="setTimerMode('pomodoro')" class="px-5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+                        Pomodoro (25m / 5m)
+                    </button>
+                </div>
+
+                <!-- Subject Selection dropdown -->
+                <div class="text-left max-w-md mx-auto space-y-1">
+                    <label class="block text-xs font-medium text-slate-400">Target Subject Being Studied</label>
+                    <select id="timer-active-subject" class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </select>
+                </div>
+
+                <!-- Stopwatch Big Display -->
+                <div class="py-6">
+                    <div id="timer-main-display" class="font-mono text-6xl sm:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
+                        00:00:00
+                    </div>
+                    <p id="timer-mode-subtitle" class="text-xs text-slate-400 mt-2">Ready to start session</p>
+                </div>
+
+                <!-- Timer Control Actions -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+                    <button id="main-timer-start" onclick="toggleTimer()" class="w-full sm:w-auto flex-1 bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-brand-600/30">
+                        <i data-lucide="play" class="w-5 h-5" id="main-timer-icon"></i>
+                        <span id="main-timer-btn-text">Start Timer</span>
+                    </button>
+                    <button onclick="resetTimer()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 px-5 rounded-xl border border-slate-700 font-medium transition flex items-center justify-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>Reset</span>
+                    </button>
+                </div>
+
+                <!-- Quick Manual Addition -->
+                <div class="pt-6 border-t border-slate-800/80 space-y-3">
+                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Offline Manual Time Addition</h4>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button onclick="addManualMinutes(15)" class="px-3 py-1.5 bg-navy-950 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 rounded-xl transition">+15 Mins</button>
+                        <button onclick="addManualMinutes(30)" class="px-3 py-1.5 bg-navy-950 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 rounded-xl transition">+30 Mins</button>
+                        <button onclick="addManualMinutes(60)" class="px-3 py-1.5 bg-navy-950 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 rounded-xl transition">+1 Hour</button>
+                        <button onclick="addManualMinutes(120)" class="px-3 py-1.5 bg-navy-950 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 rounded-xl transition">+2 Hours</button>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button id="main-save-session-btn" onclick="openSaveSessionModal()" disabled class="w-full bg-brand-600/20 text-brand-400 border border-brand-500/30 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        <span>Save & Log Session to Calendar</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-calendar" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Calendar Heatmap Grid -->
+                <div class="lg:col-span-2 bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 id="calendar-month-year" class="font-heading font-bold text-lg text-white">Month Year</h3>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeMonth(-1)" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="changeMonth(1)" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-400">
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                        <!-- Days rendered dynamically -->
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>Daily Target Heatmap:</span>
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-navy-950 border border-slate-800"></span> 0h</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-brand-950 border border-brand-800"></span> &lt;3h</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-brand-700"></span> 3-6h</div>
+                            <div class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-gold-500"></span> 6h+ (Target Met)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Log Details -->
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <h4 class="font-heading font-semibold text-white flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-4 h-4 text-brand-400"></i>
+                                <span id="selected-log-date">Today's Log</span>
+                            </h4>
+                            <span id="selected-log-total-time" class="text-xs font-bold px-2.5 py-1 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                                0h 0m
+                            </span>
+                        </div>
+
+                        <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1" id="selected-log-sessions">
+                            <p class="text-xs text-slate-500 italic text-center py-8">No study sessions recorded for this date.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="openManualLogModal()" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add Custom Time Log</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-analytics" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Total Hours Logged</h4>
+                    <div id="analytics-total-hours" class="text-3xl font-heading font-bold text-white">0h 0m</div>
+                    <p class="text-xs text-slate-500 mt-1">Overall lifetime study time</p>
+                </div>
+
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Current Active Streak</h4>
+                    <div id="analytics-streak" class="text-3xl font-heading font-bold text-gold-400 flex items-center gap-2">
+                        <span>🔥 0 Days</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Consecutive study days logged</p>
+                </div>
+
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Total Chapter Stages Cleared</h4>
+                    <div id="analytics-topics-done" class="text-3xl font-heading font-bold text-emerald-400">0</div>
+                    <p class="text-xs text-slate-500 mt-1">Includes Concepts, Practice & Revisions</p>
+                </div>
+            </div>
+
+            <!-- Subject-wise Progress -->
+            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                <h3 class="font-heading font-bold text-lg text-white">Subject-wise Completion Breakdown</h3>
+                <div id="analytics-subject-list" class="space-y-4">
+                    <!-- Dynamic subject list -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal 1: Save Timer Session -->
+    <div id="save-session-modal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-navy-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-heading font-bold text-lg text-white">Save Study Session</h3>
+                <button onclick="closeModal('save-session-modal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Time Duration Recorded</label>
+                    <div id="modal-logged-time" class="text-2xl font-mono font-bold text-brand-400">00:00:00</div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Subject</label>
+                    <select id="modal-select-subject" class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Session Notes / Topics Covered</label>
+                    <textarea id="modal-session-notes" rows="2" placeholder="e.g. Solved Scanner Questions, Revised Ind AS 115..." class="w-full bg-navy-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeModal('save-session-modal')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-medium text-sm transition">Cancel</button>
+                <button onclick="confirmSaveSession()" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white py-2.5 rounded-xl font-medium text-sm transition">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Manual Log Entry -->
+    <div id="manual-log-modal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-navy-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-heading font-bold text-lg text-white">Manual Time Entry</h3>
+                <button onclick="closeModal('manual-log-modal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Hours</label>
+                        <input type="number" id="manual-hours" min="0" max="24" value="1" class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Minutes</label>
+                        <input type="number" id="manual-minutes" min="0" max="59" value="0" class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Subject</label>
+                    <select id="manual-select-subject" class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Notes</label>
+                    <input type="text" id="manual-notes" placeholder="Library self study..." class="w-full bg-navy-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeModal('manual-log-modal')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-medium text-sm transition">Cancel</button>
+                <button onclick="confirmManualLog()" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white py-2.5 rounded-xl font-medium text-sm transition">Add Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Settings & Backup -->
+    <div id="settings-modal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-navy-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-heading font-bold text-lg text-white">Backup & Settings</h3>
+                <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-300">
+                <p class="text-xs text-slate-400">Export or import your entire study data including checkbox progress and logged timer entries.</p>
+
+                <div class="space-y-2">
+                    <button onclick="exportData()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-2.5 px-4 rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-xs font-medium">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export Backup (JSON)</span>
+                    </button>
+
+                    <label class="w-full bg-slate-800 hover:bg-slate-700 text-white py-2.5 px-4 rounded-xl border border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition text-xs font-medium">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        <span>Import Backup Data</span>
+                        <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
+                    </label>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <button onclick="resetAllProgress()" class="w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 py-2.5 px-4 rounded-xl border border-rose-500/30 flex items-center justify-center gap-2 transition text-xs font-medium">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Reset All Saved Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pre-populated ICAI Syllabus Scheme Data
+        const CA_SYLLABUS = {
+            foundation: {
+                title: "CA Foundation",
+                subjects: [
+                    {
+                        id: "f_p1",
+                        name: "Paper 1: Accounting",
+                        chapters: [
+                            "Theoretical Framework & Accounting Concepts",
+                            "Accounting Process, Subsidiary Books & Ledger",
+                            "Bank Reconciliation Statement (BRS)",
+                            "Inventories Valuation",
+                            "Depreciation & Amortisation Accounting",
+                            "Bills of Exchange & Promissory Notes",
+                            "Preparation of Final Accounts of Sole Proprietors",
+                            "Partnership and LLP Accounts",
+                            "Company Accounts (Shares & Debentures)"
+                        ]
+                    },
+                    {
+                        id: "f_p2",
+                        name: "Paper 2: Business Laws",
+                        chapters: [
+                            "Indian Regulatory Framework",
+                            "The Indian Contract Act, 1872",
+                            "The Sale of Goods Act, 1930",
+                            "The Indian Partnership Act, 1932",
+                            "The Limited Liability Partnership Act, 2008",
+                            "The Companies Act, 2013 Overview",
+                            "The Negotiable Instruments Act, 1881"
+                        ]
+                    },
+                    {
+                        id: "f_p3",
+                        name: "Paper 3: Quantitative Aptitude",
+                        chapters: [
+                            "Ratio & Proportion, Indices and Logarithms",
+                            "Equations and Matrices",
+                            "Linear Inequalities",
+                            "Time Value of Money (Interest, Annuity, CAGR)",
+                            "Permutations and Combinations",
+                            "Sequence and Series (AP & GP)",
+                            "Sets, Relations and Functions",
+                            "Differential & Integral Calculus Basics",
+                            "Logical Reasoning (Series, Coding, Seating, Blood Relations)",
+                            "Statistical Representation & Central Tendency",
+                            "Probability & Theoretical Distributions",
+                            "Correlation and Regression",
+                            "Index Numbers"
+                        ]
+                    },
+                    {
+                        id: "f_p4",
+                        name: "Paper 4: Business Economics",
+                        chapters: [
+                            "Introduction to Business Economics",
+                            "Theory of Demand and Supply",
+                            "Theory of Production and Cost",
+                            "Price Determination in Different Markets",
+                            "Determination of National Income",
+                            "Public Finance & Fiscal Policy",
+                            "Money Market & Monetary Policy",
+                            "International Trade & Foreign Exchange",
+                            "Indian Economy Overview"
+                        ]
+                    }
+                ]
+            },
+            intermediate: {
+                title: "CA Intermediate",
+                subjects: [
+                    {
+                        id: "i_p1",
+                        name: "Paper 1: Advanced Accounting",
+                        chapters: [
+                            "Introduction to Ind AS & Accounting Standards",
+                            "Applicability of Accounting Standards (AS 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 29)",
+                            "Presentation & Disclosures of Financial Statements",
+                            "Company Final Accounts Preparation",
+                            "Internal Reconstruction of Companies",
+                            "Amalgamation and Absorption of Companies",
+                            "Consolidated Financial Statements (Single Subsidiary)",
+                            "Branch Accounting & Foreign Branches"
+                        ]
+                    },
+                    {
+                        id: "i_p2",
+                        name: "Paper 2: Corporate and Other Laws",
+                        chapters: [
+                            "Company Law: Preliminary & Incorporation",
+                            "Prospectus and Allotment of Securities",
+                            "Share Capital and Debentures",
+                            "Acceptance of Deposits by Companies",
+                            "Registration of Charges",
+                            "Management & Administration (AGM, EGM)",
+                            "Declaration and Payment of Dividend",
+                            "Accounts of Companies & Audit",
+                            "Companies Incorporated Outside India",
+                            "The Limited Liability Partnership Act, 2008",
+                            "The Foreign Exchange Management Act (FEMA), 1999",
+                            "The General Clauses Act, 1897 & Interpretation of Statutes"
+                        ]
+                    },
+                    {
+                        id: "i_p3",
+                        name: "Paper 3: Taxation",
+                        chapters: [
+                            "Income Tax: Basic Concepts & Residential Status",
+                            "Income from Salaries",
+                            "Income from House Property",
+                            "Profits and Gains of Business or Profession (PGBP)",
+                            "Capital Gains",
+                            "Income from Other Sources",
+                            "Clubbing of Income & Set-off / Carry Forward of Losses",
+                            "Deductions from Gross Total Income (Chapter VI-A)",
+                            "Assessment of Individuals & Tax Computation",
+                            "TDS, TCS & Advance Tax",
+                            "GST: Concept & Charge of GST",
+                            "GST: Supply & Exemptions",
+                            "GST: Time and Value of Supply",
+                            "GST: Input Tax Credit (ITC) Provisions",
+                            "GST: Registration, Invoices & Payment of Tax"
+                        ]
+                    },
+                    {
+                        id: "i_p4",
+                        name: "Paper 4: Cost and Management Accounting",
+                        chapters: [
+                            "Introduction to Cost & Management Accounting",
+                            "Material Cost Control & Valuation",
+                            "Employee Cost & Direct Expenses",
+                            "Overheads Absorption Costing",
+                            "Activity Based Costing (ABC)",
+                            "Cost Sheet Preparation",
+                            "Job, Batch & Contract Costing",
+                            "Process & Operation Costing",
+                            "Joint Products and By-Products",
+                            "Service Costing",
+                            "Standard Costing & Variance Analysis",
+                            "Marginal Costing & CVP Analysis",
+                            "Budget and Budgetary Control"
+                        ]
+                    },
+                    {
+                        id: "i_p5",
+                        name: "Paper 5: Auditing and Ethics",
+                        chapters: [
+                            "Nature, Scope and Objective of Audit",
+                            "Audit Strategy, Planning and Programming",
+                            "Risk Assessment and Internal Control",
+                            "Audit Evidence (SA 500 series)",
+                            "Audit Sampling & Analytical Procedures",
+                            "Audit of Items of Financial Statements",
+                            "Audit Completion, Review & Report (CARO 2020)",
+                            "Special Audits (Banks, Non-profits, Hotels)",
+                            "Ethics and Professional Conduct"
+                        ]
+                    },
+                    {
+                        id: "i_p6",
+                        name: "Paper 6: Financial Management & Strategic Management",
+                        chapters: [
+                            "FM: Scope, Objective & Capital Structure",
+                            "FM: Cost of Capital & Leverage Analysis",
+                            "FM: Investment Decisions (Capital Budgeting)",
+                            "FM: Dividend Decisions",
+                            "FM: Management of Working Capital",
+                            "SM: Introduction to Strategic Management",
+                            "SM: External & Internal Environmental Analysis",
+                            "SM: Strategic Choices & Business Level Strategy",
+                            "SM: Strategy Implementation, Control & Execution"
+                        ]
+                    }
+                ]
+            },
+            final: {
+                title: "CA Final",
+                subjects: [
+                    {
+                        id: "fn_p1",
+                        name: "Paper 1: Financial Reporting (FR)",
+                        chapters: [
+                            "Framework for Application of Ind AS",
+                            "Ind AS on Presentation & Disclosures (Ind AS 1, 7, 8, 10, 34, 108)",
+                            "Ind AS on Assets (Ind AS 2, 16, 23, 36, 38, 40, 105)",
+                            "Ind AS on Revenue & Leases (Ind AS 115, 116)",
+                            "Financial Instruments (Ind AS 32, 109, 107)",
+                            "Business Combinations & Restructuring (Ind AS 103)",
+                            "Consolidated Financial Statements (Ind AS 110, 27, 28, 31)",
+                            "Share-Based Payments (Ind AS 102)",
+                            "Integrated Reporting & ESG Disclosures"
+                        ]
+                    },
+                    {
+                        id: "fn_p2",
+                        name: "Paper 2: Advanced Financial Management (AFM)",
+                        chapters: [
+                            "Financial Policy and Corporate Strategy",
+                            "Risk Management & Financial Derivatives",
+                            "Advanced Capital Budgeting Decisions",
+                            "Security Analysis & Portfolio Management",
+                            "Securitization & Mutual Funds",
+                            "Foreign Exchange Exposure & Risk Management",
+                            "International Financial Management",
+                            "Interest Rate Risk Management",
+                            "Corporate Valuation & Business Restructuring",
+                            "Mergers, Acquisitions & Takeovers"
+                        ]
+                    },
+                    {
+                        id: "fn_p3",
+                        name: "Paper 3: Advanced Auditing, Assurance & Professional Ethics",
+                        chapters: [
+                            "Quality Control & Standards on Auditing (SAs)",
+                            "Audit Strategy, Risk Assessment & Internal Control",
+                            "Audit Procedures, Evidence Gathering & Group Audits",
+                            "Audit Reports, CARO 2020 & Certificates",
+                            "Digital Auditing & Automated Environment",
+                            "Specialized Audits (PSU, Banks, NBFCs)",
+                            "Due Diligence, Investigation & Forensic Audit",
+                            "Internal Audit, Operational & Management Audit",
+                            "Sustainable Development & ESG Assurance",
+                            "Professional Ethics & Code of Conduct"
+                        ]
+                    },
+                    {
+                        id: "fn_p4",
+                        name: "Paper 4: Direct Tax Laws & International Taxation",
+                        chapters: [
+                            "Computation of Total Income & Tax Liability of Corporate Entities",
+                            "Assessment of Various Entities (Firms, LLPs, Trusts, AOPs)",
+                            "Tax Planning, Tax Avoidance & GAAR",
+                            "Deduction, Collection & Assessment Procedures",
+                            "Appeals, Revisions & Dispute Resolution",
+                            "Penalties, Offences & Prosecutions",
+                            "International Taxation: Transfer Pricing & Arm's Length Price",
+                            "Non-Resident Taxation & Equalisation Levy",
+                            "Double Taxation Relief (DTAA)",
+                            "BEPS Action Plans & Model Tax Conventions"
+                        ]
+                    },
+                    {
+                        id: "fn_p5",
+                        name: "Paper 5: Indirect Tax Laws",
+                        chapters: [
+                            "GST Architecture, Levy, Supply & Exemptions",
+                            "Place, Time and Value of Supply",
+                            "Input Tax Credit (ITC) Optimization & Matching",
+                            "Assessment, Audit, Search, Seizure & Arrest",
+                            "Appeals, Revisions and Advance Rulings",
+                            "Refunds under GST Framework",
+                            "Customs Law: Import & Export Valuation",
+                            "Customs Warehousing & Duty Drawback",
+                            "Foreign Trade Policy (FTP)"
+                        ]
+                    },
+                    {
+                        id: "fn_p6",
+                        name: "Paper 6: Integrated Business Solutions",
+                        chapters: [
+                            "Multidisciplinary Case Studies - Corporate Strategy & Financial Analysis",
+                            "Multidisciplinary Case Studies - Tax Compliance & Audit",
+                            "Multidisciplinary Case Studies - Risk Management & Global Economy"
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const MOTIVATIONAL_QUOTES = [
+            "Every revision brings you closer to the CA prefix before your name!",
+            "Discipline is choosing between what you want now and what you want most.",
+            "Stay consistent — ICAI rewards thorough preparation!",
+            "Success in CA is 1% talent and 99% hard work & revisions."
+        ];
+
+        // Global State
+        let state = {
+            currentLevel: 'intermediate',
+            dailyGoalHours: 8,
+            topicProgress: {}, // key: "level_subjId_chIndex", value: 0 (Unchecked), 1 (Concept), 2 (Practice), 3 (Rev 1), 4 (Rev 2)
+            logs: [], // Array of { id, date: "YYYY-MM-DD", timeInSeconds, subjectId, subjectName, notes }
+            accordionState: {},
+            currentCalendarDate: new Date()
+        };
+
+        // Timer State
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+        let timerMode = 'stopwatch'; // 'stopwatch' or 'pomodoro'
+        let pomodoroTargetSeconds = 25 * 60;
+
+        window.onload = function() {
+            loadStateFromStorage();
+            renderLevelTabs();
+            renderSyllabus();
+            populateSubjectDropdowns();
+            updateDashboardStats();
+            renderCalendar();
+            renderAnalytics();
+            
+            // Random quote
+            document.getElementById('quote-display').textContent = MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+            lucide.createIcons();
+        };
+
+        function loadStateFromStorage() {
+            const saved = localStorage.getItem('ca_journey_tracker_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                } catch(e) {
+                    console.error("Could not load stored state", e);
+                }
+            }
+        }
+
+        function saveStateToStorage() {
+            localStorage.setItem('ca_journey_tracker_state', JSON.stringify(state));
+            updateDashboardStats();
+            renderAnalytics();
+        }
+
+        function switchMainTab(tab) {
+            ['tracker', 'timer', 'calendar', 'analytics'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('bg-brand-600', 'text-white', 'font-semibold');
+                document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).classList.add('bg-brand-600', 'text-white', 'font-semibold');
+            document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
+
+            if (tab === 'calendar') renderCalendar();
+            if (tab === 'analytics') renderAnalytics();
+        }
+
+        function setLevel(level) {
+            state.currentLevel = level;
+            renderLevelTabs();
+            renderSyllabus();
+            populateSubjectDropdowns();
+            saveStateToStorage();
+        }
+
+        function renderLevelTabs() {
+            ['foundation', 'intermediate', 'final'].forEach(lvl => {
+                const btn = document.getElementById(`level-tab-${lvl}`);
+                if (lvl === state.currentLevel) {
+                    btn.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition bg-brand-600 text-white shadow-md";
+                } else {
+                    btn.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition text-slate-400 hover:text-white";
+                }
+            });
+
+            document.getElementById('current-level-badge').textContent = CA_SYLLABUS[state.currentLevel].title;
+        }
+
+        function renderSyllabus() {
+            const container = document.getElementById('syllabus-container');
+            const searchQuery = document.getElementById('topic-search').value.toLowerCase();
+            const levelData = CA_SYLLABUS[state.currentLevel];
+            
+            container.innerHTML = '';
+
+            levelData.subjects.forEach((subj) => {
+                const filteredChapters = subj.chapters.filter(ch => ch.toLowerCase().includes(searchQuery));
+                if (searchQuery && filteredChapters.length === 0) return;
+
+                const subjKey = `${state.currentLevel}_${subj.id}`;
+                let totalStages = subj.chapters.length * 4; // 4 stages per topic
+                let completedStages = 0;
+
+                subj.chapters.forEach((ch, cIdx) => {
+                    const topicKey = `${subjKey}_ch_${cIdx}`;
+                    const stage = state.topicProgress[topicKey] || 0;
+                    completedStages += stage;
+                });
+
+                const isExpanded = state.accordionState[subjKey] !== false;
+                const subjPercent = totalStages ? Math.round((completedStages / totalStages) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = "bg-navy-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md transition";
+
+                card.innerHTML = `
+                    <div onclick="toggleAccordion('${subjKey}')" class="p-4 bg-navy-900 hover:bg-slate-800/60 transition cursor-pointer flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3 flex-1 min-w-0">
+                            <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+                            <span class="font-heading font-semibold text-white text-sm sm:text-base truncate">${subj.name}</span>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right hidden sm:block">
+                                <div class="text-xs font-bold text-slate-300">${completedStages}/${totalStages} Stages</div>
+                                <div class="text-[10px] text-slate-500">${subjPercent}% Mastered</div>
+                            </div>
+                            <div class="w-16 sm:w-24 bg-navy-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                                <div class="bg-gradient-to-r from-brand-600 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${subjPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-content ${isExpanded ? 'block' : 'hidden'} border-t border-slate-800/80 bg-navy-950/50 p-4 space-y-2">
+                        ${filteredChapters.map((ch) => {
+                            const originalIndex = subj.chapters.indexOf(ch);
+                            const tKey = `${subjKey}_ch_${originalIndex}`;
+                            const stage = state.topicProgress[tKey] || 0;
+                            return `
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-xl bg-navy-900/60 border border-slate-800/60 gap-2">
+                                    <span class="text-xs sm:text-sm text-slate-200 font-medium">${ch}</span>
+                                    
+                                    <div class="flex items-center gap-1 self-end sm:self-auto">
+                                        <button onclick="cycleTopicStage('${tKey}', 1)" class="px-2 py-1 rounded-lg text-[10px] font-bold transition border ${stage >= 1 ? 'bg-blue-600 text-white border-blue-500' : 'bg-navy-950 text-slate-500 border-slate-800 hover:text-slate-300'}">
+                                            Concept
+                                        </button>
+                                        <button onclick="cycleTopicStage('${tKey}', 2)" class="px-2 py-1 rounded-lg text-[10px] font-bold transition border ${stage >= 2 ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-navy-950 text-slate-500 border-slate-800 hover:text-slate-300'}">
+                                            Practice
+                                        </button>
+                                        <button onclick="cycleTopicStage('${tKey}', 3)" class="px-2 py-1 rounded-lg text-[10px] font-bold transition border ${stage >= 3 ? 'bg-amber-600 text-white border-amber-500' : 'bg-navy-950 text-slate-500 border-slate-800 hover:text-slate-300'}">
+                                            Rev 1
+                                        </button>
+                                        <button onclick="cycleTopicStage('${tKey}', 4)" class="px-2 py-1 rounded-lg text-[10px] font-bold transition border ${stage >= 4 ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-navy-950 text-slate-500 border-slate-800 hover:text-slate-300'}">
+                                            Rev 2
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+            updateDashboardStats();
+        }
+
+        function toggleAccordion(key) {
+            state.accordionState[key] = !state.accordionState[key];
+            renderSyllabus();
+        }
+
+        function expandAllAccordions() {
+            const levelData = CA_SYLLABUS[state.currentLevel];
+            levelData.subjects.forEach(s => {
+                state.accordionState[`${state.currentLevel}_${s.id}`] = true;
+            });
+            renderSyllabus();
+        }
+
+        function collapseAllAccordions() {
+            const levelData = CA_SYLLABUS[state.currentLevel];
+            levelData.subjects.forEach(s => {
+                state.accordionState[`${state.currentLevel}_${s.id}`] = false;
+            });
+            renderSyllabus();
+        }
+
+        function cycleTopicStage(topicKey, targetStage) {
+            const current = state.topicProgress[topicKey] || 0;
+            if (current === targetStage) {
+                state.topicProgress[topicKey] = targetStage - 1;
+            } else {
+                state.topicProgress[topicKey] = targetStage;
+            }
+            saveStateToStorage();
+            renderSyllabus();
+        }
+
+        function setTimerMode(mode) {
+            timerMode = mode;
+            document.getElementById('mode-stopwatch-btn').className = mode === 'stopwatch' ? 'px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white transition' : 'px-5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition';
+            document.getElementById('mode-pomodoro-btn').className = mode === 'pomodoro' ? 'px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white transition' : 'px-5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition';
+
+            resetTimer();
+        }
+
+        function toggleTimer() {
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                updateTimerUI(false);
+            } else {
+                timerInterval = setInterval(() => {
+                    if (timerMode === 'stopwatch') {
+                        timerSeconds++;
+                    } else {
+                        if (timerSeconds < pomodoroTargetSeconds) {
+                            timerSeconds++;
+                        } else {
+                            clearInterval(timerInterval);
+                            isTimerRunning = false;
+                            alert("🔔 Pomodoro 25-minute focus period complete! Take a 5-minute break.");
+                        }
+                    }
+                    updateTimerDisplays();
+                }, 1000);
+                isTimerRunning = true;
+                updateTimerUI(true);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 0;
+            updateTimerDisplays();
+            updateTimerUI(false);
+            document.getElementById('main-save-session-btn').disabled = true;
+            document.getElementById('mini-save-btn').disabled = true;
+        }
+
+        function addManualMinutes(mins) {
+            timerSeconds += mins * 60;
+            updateTimerDisplays();
+            document.getElementById('main-save-session-btn').disabled = false;
+            document.getElementById('mini-save-btn').disabled = false;
+        }
+
+        function updateTimerDisplays() {
+            const hrs = Math.floor(timerSeconds / 3600);
+            const mins = Math.floor((timerSeconds % 3600) / 60);
+            const secs = timerSeconds % 60;
+            const formatted = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            
+            document.getElementById('timer-display-mini').textContent = formatted;
+            document.getElementById('timer-main-display').textContent = formatted;
+
+            if (timerSeconds > 0) {
+                document.getElementById('main-save-session-btn').disabled = false;
+                document.getElementById('mini-save-btn').disabled = false;
+            }
+        }
+
+        function updateTimerUI(running) {
+            const statusBadge = document.getElementById('timer-status-badge');
+            if (running) {
+                statusBadge.textContent = "FOCUSING";
+                statusBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                
+                document.getElementById('mini-btn-text').textContent = "Pause";
+                document.getElementById('main-timer-btn-text').textContent = "Pause Timer";
+            } else {
+                statusBadge.textContent = "IDLE";
+                statusBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700";
+                
+                document.getElementById('mini-btn-text').textContent = "Start Session";
+                document.getElementById('main-timer-btn-text').textContent = "Start Timer";
+            }
+        }
+
+        function populateSubjectDropdowns() {
+            ['modal-select-subject', 'manual-select-subject', 'timer-active-subject'].forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                select.innerHTML = '';
+                CA_SYLLABUS[state.currentLevel].subjects.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.name;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
+        function openSaveSessionModal() {
+            if (isTimerRunning) toggleTimer();
+            document.getElementById('modal-logged-time').textContent = document.getElementById('timer-main-display').textContent;
+            openModal('save-session-modal');
+        }
+
+        function confirmSaveSession() {
+            const subjectId = document.getElementById('modal-select-subject').value;
+            const notes = document.getElementById('modal-session-notes').value;
+            
+            let subjectName = "General Study";
+            CA_SYLLABUS[state.currentLevel].subjects.forEach(s => {
+                if (s.id === subjectId) subjectName = s.name;
+            });
+
+            const newLog = {
+                id: Date.now(),
+                date: getTodayDateString(),
+                timeInSeconds: timerSeconds,
+                subjectId: subjectId,
+                subjectName: subjectName,
+                notes: notes
+            };
+
+            state.logs.push(newLog);
+            saveStateToStorage();
+            closeModal('save-session-modal');
+            resetTimer();
+        }
+
+        function openManualLogModal() {
+            openModal('manual-log-modal');
+        }
+
+        function confirmManualLog() {
+            const hrs = parseInt(document.getElementById('manual-hours').value) || 0;
+            const mins = parseInt(document.getElementById('manual-minutes').value) || 0;
+            const totalSecs = (hrs * 3600) + (mins * 60);
+
+            if (totalSecs <= 0) return;
+
+            const subjectId = document.getElementById('manual-select-subject').value;
+            const notes = document.getElementById('manual-notes').value;
+            
+            let subjectName = "General Study";
+            CA_SYLLABUS[state.currentLevel].subjects.forEach(s => {
+                if (s.id === subjectId) subjectName = s.name;
+            });
+
+            state.logs.push({
+                id: Date.now(),
+                date: getTodayDateString(),
+                timeInSeconds: totalSecs,
+                subjectId: subjectId,
+                subjectName: subjectName,
+                notes: notes
+            });
+
+            saveStateToStorage();
+            closeModal('manual-log-modal');
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const date = state.currentCalendarDate;
+            const year = date.getFullYear();
+            const month = date.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const blank = document.createElement('div');
+                blank.className = "h-12 rounded-xl bg-navy-950 border border-slate-900";
+                grid.appendChild(blank);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayLogs = state.logs.filter(l => l.date === dateStr);
+                const daySecs = dayLogs.reduce((acc, l) => acc + l.timeInSeconds, 0);
+                const dayHrs = daySecs / 3600;
+
+                let bgClass = "bg-navy-950 border-slate-800/80 text-slate-400";
+                if (dayHrs > 0 && dayHrs < 3) bgClass = "bg-brand-950 border-brand-800 text-brand-300 font-semibold";
+                else if (dayHrs >= 3 && dayHrs < 6) bgClass = "bg-brand-700 border-brand-600 text-white font-bold";
+                else if (dayHrs >= 6) bgClass = "bg-gold-500 border-gold-400 text-navy-950 font-bold gold-glow";
+
+                const isToday = dateStr === getTodayDateString();
+
+                const cell = document.createElement('div');
+                cell.onclick = () => selectCalendarDate(dateStr);
+                cell.className = `h-12 rounded-xl border p-1 text-xs flex flex-col justify-between cursor-pointer transition hover:scale-105 ${bgClass} ${isToday ? 'ring-2 ring-brand-500' : ''}`;
+                cell.innerHTML = `
+                    <div class="flex justify-between items-center w-full">
+                        <span>${day}</span>
+                        ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>' : ''}
+                    </div>
+                    ${dayHrs > 0 ? `<div class="text-[10px] text-right font-mono">${dayHrs.toFixed(1)}h</div>` : ''}
+                `;
+
+                grid.appendChild(cell);
+            }
+
+            selectCalendarDate(getTodayDateString());
+        }
+
+        function changeMonth(delta) {
+            state.currentCalendarDate.setMonth(state.currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function selectCalendarDate(dateStr) {
+            document.getElementById('selected-log-date').textContent = dateStr === getTodayDateString() ? "Today's Study Log" : `Log for ${dateStr}`;
+            
+            const dayLogs = state.logs.filter(l => l.date === dateStr);
+            const totalSecs = dayLogs.reduce((acc, l) => acc + l.timeInSeconds, 0);
+
+            document.getElementById('selected-log-total-time').textContent = formatSecondsToHM(totalSecs);
+
+            const container = document.getElementById('selected-log-sessions');
+            container.innerHTML = '';
+
+            if (dayLogs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-8">No study sessions logged for this date.</p>`;
+                return;
+            }
+
+            dayLogs.forEach(log => {
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl bg-navy-950 border border-slate-800 space-y-1 relative group";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-brand-400">${log.subjectName}</span>
+                        <span class="text-xs font-mono font-bold text-white">${formatSecondsToHM(log.timeInSeconds)}</span>
+                    </div>
+                    ${log.notes ? `<p class="text-xs text-slate-400">${log.notes}</p>` : ''}
+                    <button onclick="deleteLog(${log.id})" class="absolute right-2 bottom-2 text-rose-400 opacity-0 group-hover:opacity-100 transition p-1 hover:bg-rose-950/50 rounded">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function deleteLog(logId) {
+            state.logs = state.logs.filter(l => l.id !== logId);
+            saveStateToStorage();
+            renderCalendar();
+        }
+
+        function updateDashboardStats() {
+            const levelData = CA_SYLLABUS[state.currentLevel];
+            let totalStages = 0;
+            let doneStages = 0;
+
+            levelData.subjects.forEach(s => {
+                const subjKey = `${state.currentLevel}_${s.id}`;
+                s.chapters.forEach((ch, cIdx) => {
+                    totalStages += 4;
+                    doneStages += (state.topicProgress[`${subjKey}_ch_${cIdx}`] || 0);
+                });
+            });
+
+            const overallPercent = totalStages ? Math.round((doneStages / totalStages) * 100) : 0;
+            
+            document.getElementById('stat-overall-percent').textContent = `${overallPercent}%`;
+            document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
+            document.getElementById('stat-completed-count').textContent = `${doneStages} / ${totalStages} Stage Clearances`;
+
+            const todayStr = getTodayDateString();
+            const todayLogs = state.logs.filter(l => l.date === todayStr);
+            const todaySecs = todayLogs.reduce((acc, l) => acc + l.timeInSeconds, 0);
+            document.getElementById('stat-today-time').textContent = formatSecondsToHM(todaySecs);
+
+            document.getElementById('stat-daily-goal').textContent = `${state.dailyGoalHours}h`;
+            document.getElementById('stat-week-time').textContent = formatSecondsToHM(getPast7DaysTime());
+            document.getElementById('stat-streak').textContent = `🔥 ${calculateStreak()} Days`;
+        }
+
+        function setDailyGoal() {
+            const goal = prompt("Set your target daily study goal in hours:", state.dailyGoalHours);
+            if (goal && !isNaN(goal) && goal > 0) {
+                state.dailyGoalHours = parseInt(goal);
+                saveStateToStorage();
+            }
+        }
+
+        function renderAnalytics() {
+            const totalSecs = state.logs.reduce((acc, l) => acc + l.timeInSeconds, 0);
+            document.getElementById('analytics-total-hours').textContent = formatSecondsToHM(totalSecs);
+
+            document.getElementById('analytics-streak').textContent = `🔥 ${calculateStreak()} Days`;
+
+            let stageSum = 0;
+            Object.values(state.topicProgress).forEach(v => stageSum += (v || 0));
+            document.getElementById('analytics-topics-done').textContent = stageSum;
+
+            const list = document.getElementById('analytics-subject-list');
+            list.innerHTML = '';
+
+            const levelData = CA_SYLLABUS[state.currentLevel];
+            levelData.subjects.forEach(s => {
+                const subjKey = `${state.currentLevel}_${s.id}`;
+                let done = 0;
+                let total = s.chapters.length * 4;
+
+                s.chapters.forEach((ch, cIdx) => {
+                    done += (state.topicProgress[`${subjKey}_ch_${cIdx}`] || 0);
+                });
+                const pct = total ? Math.round((done / total) * 100) : 0;
+
+                const item = document.createElement('div');
+                item.className = "bg-navy-950 p-4 rounded-xl border border-slate-800 space-y-2";
+                item.innerHTML = `
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="font-semibold text-white">${s.name}</span>
+                        <span class="font-mono text-brand-400 font-bold">${done} / ${total} Stages (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-brand-600 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function calculateStreak() {
+            let streak = 0;
+            let checkDate = new Date();
+
+            while (true) {
+                const dateStr = formatDateString(checkDate);
+                const hasLog = state.logs.some(l => l.date === dateStr);
+                
+                if (hasLog) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    if (streak === 0 && dateStr === getTodayDateString()) {
+                        checkDate.setDate(checkDate.getDate() - 1);
+                        continue;
+                    }
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        function getTodayDateString() {
+            return formatDateString(new Date());
+        }
+
+        function formatDateString(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function formatSecondsToHM(totalSecs) {
+            const hrs = Math.floor(totalSecs / 3600);
+            const mins = Math.floor((totalSecs % 3600) / 60);
+            return `${hrs}h ${mins}m`;
+        }
+
+        function getPast7DaysTime() {
+            let total = 0;
+            const now = new Date();
+            for (let i = 0; i < 7; i++) {
+                const d = new Date();
+                d.setDate(now.getDate() - i);
+                const dateStr = formatDateString(d);
+                const dayLogs = state.logs.filter(l => l.date === dateStr);
+                total += dayLogs.reduce((acc, l) => acc + l.timeInSeconds, 0);
+            }
+            return total;
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openSettingsModal() { openModal('settings-modal'); }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `CA_Journey_Tracker_Backup_${getTodayDateString()}.json`);
+            dlAnchorElem.click();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if (importedState && typeof importedState === 'object') {
+                        state = { ...state, ...importedState };
+                        saveStateToStorage();
+                        renderLevelTabs();
+                        renderSyllabus();
+                        renderCalendar();
+                        renderAnalytics();
+                        closeModal('settings-modal');
+                    }
+                } catch(err) {
+                    console.error(err);
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        function resetAllProgress() {
+            if (confirm("Are you sure you want to clear all saved progress and log data?")) {
+                localStorage.removeItem('ca_journey_tracker_state');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
